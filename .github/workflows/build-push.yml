@@ -114,5 +114,5 @@ jobs:
           echo "🚀 Deployment bundle uploaded!"
           echo "- Image: $IMAGE_URI"
           echo "- Task Definition: $TASK_DEF_ARN"
-          echo "- Bundle: s3://${{ env.ARTIFACT_BUCKET }}/appspec-bundle.zip"
+          echo "- Bundle: s3://${{ env.ARTIFACT_BUCKET }}/photo-gallery-bundle.zip"
           echo "- CodePipeline will automatically pick up this artifact."

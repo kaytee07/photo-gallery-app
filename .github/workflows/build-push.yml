@@ -11,7 +11,7 @@ permissions:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-  ARTIFACT_BUCKET: ${{ secrets.ARTIFACT_BUCKET }} # must match your CFN templates
+  ARTIFACT_BUCKET: 714377355835-photo-gallery-artifacts # must match your CFN templates
 
 jobs:
   build-and-deploy:

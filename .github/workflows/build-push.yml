@@ -54,7 +54,7 @@ jobs:
 
       - name: Generate taskdef.json
         env:
-          EcsTaskExecutionRoleArn: arn:aws:iam::714377355835:role/ecsTaskExecutionRole
+          EcsTaskExecutionRoleArn: arn:aws:iam::714377355835:role/taylor-ecs-rds-iam-stack-EcsTaskExecutionRole-aQ0qMhNEt2Gb
         run: |
           cat > taskdef.json <<EOL
           {

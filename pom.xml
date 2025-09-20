@@ -64,6 +64,12 @@
             <artifactId>aws-advanced-jdbc-wrapper</artifactId>
             <version>2.6.4</version> </dependency>
         <dependency>
+            <groupId>com.amazonaws.secretsmanager</groupId>
+            <artifactId>aws-secretsmanager-jdbc</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+
+        <dependency>
             <groupId>me.paulschwarz</groupId>
             <artifactId>spring-dotenv</artifactId>
             <version>3.0.0</version>

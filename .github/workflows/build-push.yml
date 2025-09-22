@@ -11,7 +11,7 @@ permissions:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-  ARTIFACT_BUCKET: 714377355835-photo-gallery-artifacts # must match your CFN template
+  ARTIFACT_BUCKET: first-photo-gallery-artifacts # must match your CFN template
 
 jobs:
   build-and-deploy:
@@ -54,7 +54,7 @@ jobs:
 
       - name: Generate taskdef.json
         env:
-          EcsTaskExecutionRoleArn: arn:aws:iam::714377355835:role/taylor-ecs-rds-iam-stack-EcsTaskExecutionRole-aQ0qMhNEt2Gb
+          EcsTaskExecutionRoleArn: arn:aws:iam::714377355835:role/ecs-rds-iam-stack-EcsTaskExecutionRole-0VG1NbvKlqwk
         run: |
           cat > taskdef.json <<EOL
           {

@@ -77,7 +77,7 @@ public class PhotoService {
 
     public void deleteImage(Long id) {
         ImageMetadata image = repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Image not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Image not found with id:: " + id));
 
 
         s3Client.deleteObject(DeleteObjectRequest.builder()

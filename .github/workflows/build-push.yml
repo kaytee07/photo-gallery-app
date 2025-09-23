@@ -51,7 +51,7 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
-      # ... rest of your workflow remains the same ...
+      # ... rest of your workflow remains the sames ...
 
       - name: Generate taskdef.json
         env:

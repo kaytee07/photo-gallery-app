@@ -76,6 +76,14 @@ jobs:
                   }
                 ],
                 "essential": true
+                "logConfiguration": {
+                  "logDriver": "awslogs",
+                  "options": {
+                    "awslogs-group": "/ecs/spring-boot-app",
+                    "awslogs-region": "${AWS_REGION}",
+                    "awslogs-stream-prefix": "ecs"
+                  }
+              }
               }
             ]
           }

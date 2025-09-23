@@ -75,7 +75,7 @@ jobs:
                     "protocol": "tcp"
                   }
                 ],
-                "essential": true
+                "essential": true,
                 "logConfiguration": {
                   "logDriver": "awslogs",
                   "options": {

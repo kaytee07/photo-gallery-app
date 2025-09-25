@@ -21,7 +21,8 @@ RUN ./mvnw clean package -DskipTests -B
 # ========================
 # Stage 2: Run
 # ========================
-FROM eclipse-temurin:21-jre-jammy  # JRE for smaller runtime image (~200MB vs 500MB)
+# Using JRE for smaller runtime image (~200MB vs 500MB)
+FROM eclipse-temurin:21-jre-jammy
 
 WORKDIR /app
 
@@ -44,3 +45,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
 
 # Start the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
+

@@ -47,9 +47,9 @@ jobs:
           IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           # Build fresh Docker image from new JAR
           docker build -t $IMAGE_URI .
-          
-          # Optional: Update :latest
-          docker tag $IMAGE_URI $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $IMAGE_URI
+#          # Optional: Update :latest
+#          docker tag $IMAGE_URI $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
@@ -82,7 +82,7 @@ jobs:
             "containerDefinitions": [
               {
                 "name": "spring-boot-container",
-                "image": "${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}",   // 👈 use commit SHA
+                "image": "${IMAGE_URI}",
                 "portMappings": [
                   {
                     "containerPort": 8080,

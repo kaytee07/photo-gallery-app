@@ -82,7 +82,7 @@ jobs:
             "containerDefinitions": [
               {
                 "name": "spring-boot-container",
-                "image": "${ECR_REGISTRY}/${ECR_REPOSITORY}:latest",
+                "image": "${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}",   // 👈 use commit SHA
                 "portMappings": [
                   {
                     "containerPort": 8080,

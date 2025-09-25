@@ -15,7 +15,7 @@ import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;  // New: For S3 error handling
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class PhotoService {
-    private static final Logger logger = LoggerFactory.getLogger(PhotoService.class);  // New: Logger instance
+    private static final Logger logger = LoggerFactory.getLogger(PhotoService.class);
 
     private final ImageMetadataRepository repository;
     private final S3Client s3Client;
@@ -83,30 +83,30 @@ public class PhotoService {
     @Transactional  // New: Ensures atomicity (rollback if S3 delete fails)
     public void deleteImage(Long id) {
         ImageMetadata image = repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Image not found with id: " + id));  // Fixed minor typo in message
+                .orElseThrow(() -> new IllegalArgumentException("Image not found with id: " + id));
 
         String objectKey = image.getS3ObjectKey();
-        if (objectKey != null && !objectKey.isEmpty()) {  // New: Null check for safety
+        if (objectKey != null && !objectKey.isEmpty()) {
             try {
-                logger.info("Deleting S3 object: {}/{}", bucketName, objectKey);  // New: Log intent
+                logger.info("Deleting S3 object: {}/{}", bucketName, objectKey);
                 s3Client.deleteObject(DeleteObjectRequest.builder()
                         .bucket(bucketName)
                         .key(objectKey)
                         .build());
-                logger.info("S3 object deleted successfully for ID: {}", id);  // New: Log success
+                logger.info("S3 object deleted successfully for ID: {}", id);
             } catch (NoSuchKeyException e) {
-                logger.warn("S3 object not found (already deleted?): {}/{} for ID: {}", bucketName, objectKey, id);  // New: Handle missing key gracefully
+                logger.warn("S3 object not found (already deleted?): {}/{} for ID: {}", bucketName, objectKey, id);
             } catch (Exception e) {
-                logger.error("Failed to delete S3 object {}/{} for ID: {} - {}", bucketName, objectKey, id, e.getMessage());  // New: Catch other errors (e.g., perms)
-                throw new RuntimeException("S3 deletion failed; transaction will rollback", e);  // New: Re-throw to trigger rollback
+                logger.error("Failed to delete S3 object {}/{} for ID: {} - {}", bucketName, objectKey, id, e.getMessage());
+                throw new RuntimeException("S3 deletion failed; transaction will rollback", e);
             }
         } else {
-            logger.warn("No S3 key found for image ID: {}", id);  // New: Log if no key
+            logger.warn("No S3 key found for image ID: {}", id);
         }
 
-        logger.info("Deleting DB metadata for ID: {}", id);  // New: Log DB delete
+        logger.info("Deleting DB metadata for ID: {}", id);
         repository.deleteById(id);
-        logger.info("Image deleted successfully (DB + S3) for ID: {}", id);  // New: Log completion
+        logger.info("Image deleted successfully (DB + S3) for ID: {}", id);
     }
 
     public List<ImageDto> getAllImages() {

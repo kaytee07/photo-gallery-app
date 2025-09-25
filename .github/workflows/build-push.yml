@@ -27,7 +27,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn clean package -DskipTests
+        run: mvn clean package -DskipTests  # Builds fresh JAR with static files (index.html)
 
       - name: Configure AWS Credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v4
@@ -42,16 +42,27 @@ jobs:
       - name: Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ github.sha }}  # Dynamic tag for each push (forces new pull)
         run: |
           IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          # Build fresh Docker image from new JAR
           docker build -t $IMAGE_URI .
-          docker tag $IMAGE_URI $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $IMAGE_URI
+          # Optional: Update :latest
+          docker tag $IMAGE_URI $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
-      # ... rest of your workflow remains the sames ...
+      - name: Generate imagedefinitions.json  # NEW: For CodeDeploy to use new image tag
+        run: |
+          cat > imagedefinitions.json << EOL
+          [
+            {
+              "name": "spring-boot-container",
+              "imageUri": "${{ env.IMAGE_URI }}"
+            }
+          ]
+          EOL
 
       - name: Generate taskdef.json
         env:
@@ -132,7 +143,7 @@ jobs:
           cat appspec.yaml
 
       - name: Package AppSpec bundle
-        run: zip photo-gallery-bundle.zip appspec.yaml taskdef.json
+        run: zip photo-gallery-bundle.zip appspec.yaml taskdef.json imagedefinitions.json  # Include imagedefinitions.json
 
       - name: Upload bundle to S3
         run: aws s3 cp photo-gallery-bundle.zip s3://${{ env.ARTIFACT_BUCKET }}/

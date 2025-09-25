@@ -47,7 +47,7 @@ jobs:
           IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           # Build fresh Docker image from new JAR
           docker build -t $IMAGE_URI .
-          docker push $IMAGE_URI
+          
           # Optional: Update :latest
           docker tag $IMAGE_URI $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest

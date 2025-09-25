@@ -82,7 +82,7 @@ jobs:
             "containerDefinitions": [
               {
                 "name": "spring-boot-container",
-                "image": "${IMAGE_URI}",
+                "image": "${ECR_REGISTRY}/${ECR_REPOSITORY}:latest",
                 "portMappings": [
                   {
                     "containerPort": 8080,

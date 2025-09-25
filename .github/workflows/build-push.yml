@@ -45,12 +45,11 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}  # Dynamic tag for each push (forces new pull)
         run: |
           IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          # Build fresh Docker image from new JAR
           docker build -t $IMAGE_URI .
-          
-          # Optional: Update :latest
           docker tag $IMAGE_URI $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $IMAGE_URI
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
       - name: Generate imagedefinitions.json  # NEW: For CodeDeploy to use new image tag

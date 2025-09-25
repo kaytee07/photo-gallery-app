@@ -141,12 +141,27 @@ jobs:
           EOL
           echo "Generated AppSpec file:"
           cat appspec.yaml
+          
 
       - name: Package AppSpec bundle
         run: zip photo-gallery-bundle.zip appspec.yaml taskdef.json imagedefinitions.json  # Include imagedefinitions.json
 
       - name: Upload bundle to S3
         run: aws s3 cp photo-gallery-bundle.zip s3://${{ env.ARTIFACT_BUCKET }}/
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}  # Dynamic tag for each push (forces new pull)
+        run: |
+          IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          # Build fresh Docker image from new JAR
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
+          # Optional: Update :latest
+          docker tag $IMAGE_URI $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
       - name: Deployment Summary
         run: |

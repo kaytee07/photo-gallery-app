@@ -1,4 +1,4 @@
-name: Build, Push, and Upload Deployment Bundle.
+name: Build, Push, and Upload Deployment Bundle
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-  ARTIFACT_BUCKET: first-photo-gallery-artifacts # must match your CFN templates
+  ARTIFACT_BUCKET: first-photo-gallery-artifacts
 
 jobs:
   build-and-deploy:
@@ -27,7 +27,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn clean package -DskipTests  # Builds fresh JAR with static files (index.html)
+        run: mvn clean package -DskipTests
 
       - name: Configure AWS Credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v4
@@ -42,7 +42,7 @@ jobs:
       - name: Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}  # Dynamic tag for each push (forces new pull)
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker build -t $IMAGE_URI .
@@ -52,7 +52,7 @@ jobs:
           
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
-      - name: Generate imagedefinitions.json  # NEW: For CodeDeploy to use new image tag
+      - name: Generate imagedefinitions.json
         run: |
           cat > imagedefinitions.json << EOL
           [
@@ -81,7 +81,7 @@ jobs:
             "containerDefinitions": [
               {
                 "name": "spring-boot-container",
-                "image": "${IMAGE_URI}:latest",
+                "image": "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest",
                 "portMappings": [
                   {
                     "containerPort": 8080,
@@ -140,27 +140,12 @@ jobs:
           EOL
           echo "Generated AppSpec file:"
           cat appspec.yaml
-          
 
       - name: Package AppSpec bundle
-        run: zip photo-gallery-bundle.zip appspec.yaml taskdef.json imagedefinitions.json  # Include imagedefinitions.json
+        run: zip photo-gallery-bundle.zip appspec.yaml taskdef.json imagedefinitions.json
 
       - name: Upload bundle to S3
         run: aws s3 cp photo-gallery-bundle.zip s3://${{ env.ARTIFACT_BUCKET }}/
-
-      - name: Build, tag, and push image to Amazon ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}  # Dynamic tag for each push (forces new pull)
-        run: |
-          IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          # Build fresh Docker image from new JAR
-          docker build -t $IMAGE_URI .
-          docker push $IMAGE_URI
-          # Optional: Update :latest
-          docker tag $IMAGE_URI $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
       - name: Deployment Summary
         run: |

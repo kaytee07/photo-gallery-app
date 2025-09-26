@@ -65,8 +65,8 @@ jobs:
 
       - name: Generate taskdef.json
         env:
-          EcsTaskExecutionRoleArn: arn:aws:iam::714377355835:role/ecs-rds-iam-stack-EcsTaskExecutionRole-0VG1NbvKlqwk
-          EcsTaskRoleArn: arn:aws:iam::714377355835:role/ecs-rds-iam-stack-EcsTaskRole-69U58v51rsRh
+          EcsTaskExecutionRoleArn: ${{ secrets.ECS_TASKEXECUTION_ROLE }}
+          EcsTaskRoleArn: ${{ secrets.ECS_TASK_ROLE }}
           S3_BUCKET_NAME: photo-gallery-bucket-unique-images-1
         run: |
           cat > taskdef.json <<EOL
